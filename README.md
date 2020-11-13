@@ -4,7 +4,7 @@ As part of the Master Course "Interactive Data Visualization" at Paderborn Unive
 
 Group Members: Varun Golani, Lalith Sagar, Sanjay Gupta.
 
-We used the following data source to perform our task as follows:
+We used the following data source to perform our task:
 
 Dataset Name: Our World in Data (University of Oxford)
 
