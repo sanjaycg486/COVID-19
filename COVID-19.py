@@ -1,10 +1,7 @@
 import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
-import dash
-import dash_core_components as dcc
-import dash_html_components as html
-from dash.dependencies import Input, Output
+from dash import Dash, dcc, html, Input, Output
 
 # Reading the csv data file via Github URL and filtering the data based on the continent 'Europe' start.
 data_set_url = 'https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv'
@@ -14,8 +11,36 @@ covid19_data_frame = covid19_data_frame.loc[
 # Reading the csv data file via Github URL and filtering the data based on the continent 'Europe' End.
 
 # CSS stylesheet for dash start.
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css']
+app = Dash(__name__, external_stylesheets=external_stylesheets)
+app.title = 'COVID-19 Analysis in Europe.'
+
+#Overwrite your CSS setting by including style locally
+colors = {
+    'background': '#2D2D2D',
+    'text': '#E1E2E5',
+    'figure_text': '#ffffff',
+    'confirmed_text':'#3CA4FF',
+    'deaths_text':'#f44336',
+    'recovered_text':'#5A9E6F',
+    'highest_case_bg':'#393939',
+    
+}
+
+#Creating custom style for local use
+divBorderStyle = {
+    'backgroundColor' : '#393939',
+    'borderRadius': '12px',
+    'lineHeight': 0.9,
+}
+
+#Creating custom style for local use
+boxBorderStyle = {
+    'borderColor' : '#393939',
+    'borderStyle': 'solid',
+    'borderRadius': '10px',
+    'borderWidth':2,
+}
 # CSS stylesheet for dash end.
 
 # Task 1 from the concept paper start.
@@ -183,20 +208,271 @@ fig4.update_layout(height=700, title='Choropleth map (Europe)')
 # Task 4 from the concept paper End.
 
 # Dash code start.
-app.layout = html.Div([
-    html.H1(
-        children='COVID-19 Data Visualization',
-        style={
-            'textAlign': 'center'}
-    ),
-    dcc.Tabs(id="tabs", value="tab-4", children=[
-        dcc.Tab(label='Dashboard (Task 4)', value='tab-4'),
-        dcc.Tab(label='Task 1', value='tab-1'),
-        dcc.Tab(label='Task 2', value='tab-2'),
-        dcc.Tab(label='Task 3', value='tab-3')
-    ]),
-    html.Div(id="tabs-content")
-])
+app.layout = html.Div(
+    html.Div([
+        
+        # Header display
+        html.Div(
+            [
+                html.H1(children='Analysis and Visualization of COVID-19 Impact and Response in Europe.',
+                        style={
+                            'textAlign': 'left',
+                            'color': colors['text'],
+                            'backgroundColor': colors['background'],
+                        },
+                        className='ten columns',
+                        ),
+
+                html.Div([
+                    html.Button(html.I(className="fa fa-info-circle"),
+                        id='info-button',
+                        style={
+                             'color': colors['text'],
+                             'fontSize':'36px'
+
+                         },)
+
+                ],className='two columns',),
+
+                # Preload Modal windows and set "display": "none" to hide it first
+                html.Div([  # modal div
+                    html.Div([  # content div
+
+                        dcc.Markdown('''
+                            ##### Dataset provided by Johns Hopkins University Center for Systems Science and Engineering (JHU CSSE):
+                            https://systems.jhu.edu/
+                           
+                            Data Sources:
+                            * World Health Organization (WHO): https://www.who.int/
+                            * DXY.cn. Pneumonia. 2020. http://3g.dxy.cn/newh5/view/pneumonia.
+                            * BNO News: https://bnonews.com/index.php/2020/02/the-latest-coronavirus-cases/
+                            * National Health Commission of the People’s Republic of China (NHC):
+                            http://www.nhc.gov.cn/xcs/yqtb/list_gzbd.shtml
+                            * China CDC (CCDC): http://weekly.chinacdc.cn/news/TrackingtheEpidemic.htm
+                            * Hong Kong Department of Health: https://www.chp.gov.hk/en/features/102465.html
+                            * Macau Government: https://www.ssm.gov.mo/portal/
+                            * Taiwan CDC: https://sites.google.com/cdc.gov.tw/2019ncov/taiwan?authuser=0
+                            * US CDC: https://www.cdc.gov/coronavirus/2019-ncov/index.html
+                            * Government of Canada: https://www.canada.ca/en/public-health/services/diseases/coronavirus.html
+                            * Australia Government Department of Health: https://www.health.gov.au/news/coronavirus-update-at-a-glance
+                            * European Centre for Disease Prevention and Control (ECDC): https://www.ecdc.europa.eu/en/geographical-distribution-2019-ncov-cases 
+                            * Ministry of Health Singapore (MOH): https://www.moh.gov.sg/covid-19
+                            * Italy Ministry of Health: http://www.salute.gov.it/nuovocoronavirus
+                            * 1Point3Arces: https://coronavirus.1point3acres.com/en
+                            * WorldoMeters: https://www.worldometers.info/coronavirus/
+                            '''),
+                        html.Hr(),
+                        html.Button('Close', id='modal-close-button',
+                        style={
+                             'color': colors['text'],
+                         },)
+                    ],
+                        style={
+                            'fontSize': 10,
+                            'lineHeight': 0.9,
+                        },
+                        className='modal-content',
+                    ),
+                ],
+                    id='modal',
+                    className='modal',
+                    style={"display": "none"},
+                ),
+            ], className="row"
+        ),
+
+        # Top column display of confirmed, death and recovered total numbers
+        html.Div([
+            html.Div([
+                html.H4(children='Total Cases: ',
+                       style={
+                           'textAlign': 'center',
+                           'color': colors['confirmed_text'],
+                       }
+                       ),
+                html.P(f"{df_confirmed_total[-1]:,d}",
+                       style={
+                    'textAlign': 'center',
+                    'color': colors['confirmed_text'],
+                    'fontSize': 30,
+                }
+                ),
+                html.P('Past 24hrs increase: +' + f"{df_confirmed_total[-1] - df_confirmed_total[-2]:,d}"
+                       + ' (' + str(round(((df_confirmed_total[-1] - df_confirmed_total[-2])/df_confirmed_total[-1])*100, 2)) + '%)',
+                       style={
+                    'textAlign': 'center',
+                    'color': colors['confirmed_text'],
+                }
+                ),
+            ],
+                style=divBorderStyle,
+                className='four columns',
+            ),
+            html.Div([
+                html.H4(children='Total Deceased: ',
+                       style={
+                           'textAlign': 'center',
+                           'color': colors['deaths_text'],
+                       }
+                       ),
+                html.P(f"{df_deaths_total[-1]:,d}",
+                       style={
+                    'textAlign': 'center',
+                    'color': colors['deaths_text'],
+                    'fontSize': 30,
+                }
+                ),
+                html.P('Mortality Rate: ' + str(round(df_deaths_total[-1]/df_confirmed_total[-1] * 100, 3)) + '%',
+                       style={
+                    'textAlign': 'center',
+                    'color': colors['deaths_text'],
+                }
+                ),
+            ],
+                style=divBorderStyle,
+                className='four columns'),
+            html.Div([
+                html.H4(children='Total Recovered: ',
+                       style={
+                           'textAlign': 'center',
+                           'color': colors['recovered_text'],
+                       }
+                       ),
+                html.P(f"{df_recovered_total[-1]:,d}",
+                       style={
+                    'textAlign': 'center',
+                    'color': colors['recovered_text'],
+                    'fontSize': 30,
+                }
+                ),
+                html.P('Recovery Rate: ' + str(round(df_recovered_total[-1]/df_confirmed_total[-1] * 100, 3)) + '%',
+                       style={
+                    'textAlign': 'center',
+                    'color': colors['recovered_text'],
+                }
+                ),
+            ],
+                style=divBorderStyle,
+                className='four columns'),
+        ], className='row'),
+
+        # place the line graph and the parallel coordinates plot side by side
+        html.Div(
+            [
+                # html.H4(children='Global Covid-19 cases',
+                #          style={
+                #              'textAlign': 'center',
+                #              'color': colors['text'],
+                #              'backgroundColor': colors['background'],
+
+                #          },
+                #          className='twelve columns'
+                #          ),
+                
+                html.Div([
+                    # add a dropdown for selecting the country                    
+
+                    # dcc.RadioItems(
+                    #     id='graph-type',
+                    #     options=[{'label': i, 'value': i}
+                    #              for i in ['Total Cases', 'Daily Cases']],
+                    #     value='Total Cases',
+                    #     labelStyle={'display': 'inline-block'},
+                    #     style={
+                    #         'fontSize': 20,
+                    #      },
+                        
+                    # )
+                ],className='six columns'
+                ),
+                
+                html.Div([
+                    # add a DatePickerRange for selecting the date range
+
+                    # dcc.RadioItems(
+                    #     id='graph-high10-type',
+                    #     options=[{'label': i, 'value': i}
+                    #              for i in ['Confirmed Cases', 'Deceased Cases']],
+                    #     value='Confirmed Cases',
+                    #     labelStyle={'display': 'inline-block'},
+                    #     style={
+                    #         'fontSize': 20,
+                    #      },
+                        
+                    # )
+                ],className='five columns'
+                ),
+                
+                html.Div([
+                    dcc.Graph(
+                        id='line-graph',
+
+                    )
+                ], className='six columns'
+                ),
+                
+                html.Div([
+                    dcc.Graph(
+                        id='parallel-coordinates-plot',
+
+                    )
+                ], className='five columns'
+                ),
+
+            ], className="row",
+            style={
+                'textAlign': 'left',
+                'color': colors['text'],
+                'backgroundColor': colors['background'],
+            },
+        ),
+
+        # place the pie chart and the choropleth map side by side
+        html.Div(
+            [
+                html.Div([
+                    dcc.Graph(
+                        id='pie-chart',
+
+                    )
+                ], className='six columns'
+                ),
+                
+                html.Div([
+                    dcc.Graph(
+                        id='map',
+
+                    )
+                ], className='five columns'
+                ),
+            ], className="row",
+            style={
+                'textAlign': 'left',
+                'color': colors['text'],
+                'backgroundColor': colors['background'],
+            },
+        ),
+     ], className='ten columns offset-by-one'
+    ), 
+    style={
+        'textAlign': 'left',
+        'color': colors['text'],
+        'backgroundColor': colors['background'],
+    },                 
+    # html.H1(
+    #     children='COVID-19 Data Visualization',
+    #     style={
+    #         'textAlign': 'center'}
+    # ),
+    # dcc.Tabs(id="tabs", value="tab-4", children=[
+    #     dcc.Tab(label='Dashboard (Task 4)', value='tab-4'),
+    #     dcc.Tab(label='Task 1', value='tab-1'),
+    #     dcc.Tab(label='Task 2', value='tab-2'),
+    #     dcc.Tab(label='Task 3', value='tab-3')
+    # ]),
+    # html.Div(id="tabs-content")
+)
+# Dash code end.
 
 
 @app.callback(Output('tabs-content', 'children'),
