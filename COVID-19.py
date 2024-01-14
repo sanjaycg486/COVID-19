@@ -16,6 +16,8 @@ confirmed_new_cases = 0 if pd.isna(covid19_data_frame['new_cases'].values[-1]) e
 confirmed_total_deaths = covid19_data_frame['total_deaths'].sum()
 confirmed_new_deaths = 0 if pd.isna(covid19_data_frame['new_deaths'].values[-1]) else covid19_data_frame['new_deaths'].values[-1]
 
+countries_in_europe = covid19_data_frame['location'].unique().tolist()
+
 # Reading the csv data file via Github URL and filtering the data based on the continent 'Europe' End.
 
 # CSS stylesheet for dash start.
@@ -51,10 +53,10 @@ boxBorderStyle = {
 }
 # CSS stylesheet for dash end.
 
+
+
 # Task 1 from the concept paper start.
 # Coded by Varun Nandkumar Golani
-
-countries_in_europe = covid19_data_frame['location'].unique().tolist()
 
 # Creating color dictionary by combining different discrete plotly maps
 color_list = px.colors.qualitative.Alphabet + px.colors.qualitative.Dark24 + px.colors.qualitative.Dark2
@@ -428,53 +430,28 @@ app.layout = html.Div(
             ),
         ], className='row'),
 
+        # add a dropdown for country selection and a date range picker
+        html.Div([
+            
+            html.Div([
+                dcc.Dropdown(id='country-dropdown',
+                             options=[{'label': i, 'value': i} for i in countries_in_europe],
+                             value= countries_in_europe[0],  # Default value 
+                             multi=True,  # Allow multiple selections
+                             ),
+            ], style=divBorderStyle, className='four columns'),
+
+            html.Div([
+                dcc.DatePickerRange(id='date-range-slider',
+                                    start_date=covid19_data_frame['date'].min(),
+                                    end_date=covid19_data_frame['date'].max(),
+                                    display_format='YYYY-MM-DD')                               
+            ], style=divBorderStyle, className='four columns',),
+        ], className='row'),
+
         # place the line graph and the parallel coordinates plot side by side
         html.Div(
             [
-                # html.H4(children='Global Covid-19 cases',
-                #          style={
-                #              'textAlign': 'center',
-                #              'color': colors['text'],
-                #              'backgroundColor': colors['background'],
-
-                #          },
-                #          className='twelve columns'
-                #          ),
-                
-                html.Div([
-                    # add a dropdown for selecting the country                    
-
-                    # dcc.RadioItems(
-                    #     id='graph-type',
-                    #     options=[{'label': i, 'value': i}
-                    #              for i in ['Total Cases', 'Daily Cases']],
-                    #     value='Total Cases',
-                    #     labelStyle={'display': 'inline-block'},
-                    #     style={
-                    #         'fontSize': 20,
-                    #      },
-                        
-                    # )
-                ],className='six columns'
-                ),
-                
-                html.Div([
-                    # add a DatePickerRange for selecting the date range
-
-                    # dcc.RadioItems(
-                    #     id='graph-high10-type',
-                    #     options=[{'label': i, 'value': i}
-                    #              for i in ['Confirmed Cases', 'Deceased Cases']],
-                    #     value='Confirmed Cases',
-                    #     labelStyle={'display': 'inline-block'},
-                    #     style={
-                    #         'fontSize': 20,
-                    #      },
-                        
-                    # )
-                ],className='five columns'
-                ),
-                
                 html.Div([
                     dcc.Graph(
                         id='line-graph',
@@ -558,6 +535,69 @@ app.layout = html.Div(
 #         return html.Div([dcc.Graph(id='pie-chart', figure=fig3)])
 #     else:
 #         return html.Div([dcc.Graph(id='choropleth-map', figure=fig4)])
+
+# Update the line graph based on the country selection and date range picker.
+@app.callback(Output('line-graph', 'figure'),
+              [Input('country-dropdown', 'value'),
+               Input('date-range-slider', 'start_date'),
+               Input('date-range-slider', 'end_date')])
+def update_line_graph(countries, start_date, end_date):
+    fig_line_graph = px.line(covid19_data_frame.loc[(covid19_data_frame['location'].isin(countries))
+                                                    & (covid19_data_frame['date'] >= start_date)
+                                                    & (covid19_data_frame['date'] <= end_date)],
+                             x='date', y='stringency_index',
+                             labels={'date': 'Date', 'stringency_index': 'Government stringency index (0-100)',
+                                     'location': 'European country', 'total_cases': 'Total confirmed cases',
+                                     'total_deaths': 'Total deaths', 'new_cases': 'New confirmed cases',
+                                     'new_deaths': 'New deaths'},
+                             color='location', color_discrete_map=color_dict,
+                             hover_data=['total_cases', 'total_deaths', 'new_cases', 'new_deaths'],
+                             title='Line Graphs for Multivariate Data', height=700)
+    return fig_line_graph
+
+# Update the parallel coordinates plot based on the country selection and date range picker.
+@app.callback(Output('parallel-coordinates', 'figure'),
+              [Input('country-dropdown', 'value'),
+               Input('date-range-slider', 'start_date'),
+               Input('date-range-slider', 'end_date')])
+def update_parallel_coordinates_plot(country, start_date, end_date):
+    fig_parallel_coordinates = go.Figure(data=go.Parcoords())
+
+    return fig_parallel_coordinates
+
+# Update the pie chart based on the country selection and date range picker.
+@app.callback(Output('pie-chart', 'figure'),
+              [Input('country-dropdown', 'value'),
+               Input('date-range-slider', 'start_date'),
+               Input('date-range-slider', 'end_date')])
+def update_pie_chart(countries, start_date, end_date):
+    fig_pie_chart = px.pie(covid19_data_frame.loc[(covid19_data_frame['location'].isin(countries))
+                                                  & (covid19_data_frame['date'] >= start_date)
+                                                  & (covid19_data_frame['date'] <= end_date)],
+                           values='total_tests', names='location', title='Pie Chart'
+                           , color='location', color_discrete_map=color_dict, hover_data=['date']
+                           , labels={'location': 'European country', 'date': 'Recent data available date',
+                                     'total_tests': 'Total tests'}, height=700)
+    
+    return fig_pie_chart
+
+# Update the choropleth map based on the country selection and date range picker.
+@app.callback(Output('choropleth-map', 'figure'),
+              [Input('country-dropdown', 'value'),
+               Input('date-range-slider', 'start_date'),
+               Input('date-range-slider', 'end_date')])
+def update_choropleth_map(countries, start_date, end_date):
+    fig_choropleth_map = px.choropleth(covid19_data_frame.loc[(covid19_data_frame['location'].isin(countries))
+                                                              & (covid19_data_frame['date'] >= start_date)
+                                                              & (covid19_data_frame['date'] <= end_date)],
+                                       color='iso_code', locations='iso_code',
+                                       hover_name='location', hover_data=['date', 'covid19_death_rate', 'total_deaths', 'total_cases'],
+                                       labels={'iso_code': 'ISO code', 'date': 'Date', 'location': 'European country',
+                                               'total_cases': 'Total confirmed cases', 'total_deaths': 'Total deaths',
+                                               'covid19_death_rate': 'COVID-19 Death rate(%)'},
+                                       scope="europe", color_discrete_map=iso_code_color_dict)
+    
+    return fig_choropleth_map
 
 # hide/show modal
 @app.callback(Output('modal', 'style'),
