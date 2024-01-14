@@ -1,0 +1,40 @@
+body {
+    background-color: #2D2D2D;
+}
+
+.Select-control {
+    background-color: #393939;
+    border: 2px solid #CD6;
+    border-radius: 5px;    
+}
+
+.DateRangePickerInput{
+    background-color: #393939;
+    border: 2px solid #CD6;
+    border-radius: 2px;
+    width: 367px !important    
+}
+
+.DateInput_input{
+    background-color: #393939 !important;
+    /* border: 2px solid #CD6 !important; */
+    border-radius: 2px !important;
+    color: #fff !important;
+}
+.DateRangePickerInput_arrow_svg{
+    color: #fff !important;
+}
+
+#line-graph {    
+    border: 1px solid rgb(104, 102, 221);            
+}
+
+#parallel-coordinates {    
+    border: 1px solid rgb(104, 102, 221);            
+}
+#pie-chart {    
+    border: 1px solid rgb(104, 102, 221);            
+}
+#choropleth-map {    
+    border: 1px solid rgb(104, 102, 221);            
+}

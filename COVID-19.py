@@ -6,8 +6,14 @@ import datetime
 
 # CSS stylesheet for dash start.
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css']
-app = Dash(__name__, external_stylesheets=external_stylesheets)
+app = Dash(
+    __name__, 
+    meta_tags=[{"name": "viewport", "content": "width=device-width, initial-scale=1"}], 
+    external_stylesheets=external_stylesheets
+)
 app.title = 'COVID-19 Analysis in Europe.'
+
+server = app.server
 
 #Overwrite your CSS setting by including style locally
 colors = {
@@ -24,7 +30,7 @@ colors = {
 #Creating custom style for local use
 divBorderStyle = {
     'backgroundColor' : '#393939',
-    'borderRadius': '12px',
+    'borderRadius': '10px',
     'lineHeight': 0.9,
 }
 
@@ -47,7 +53,7 @@ covid19_data_frame = pd.read_csv(data_set_url)
 covid19_data_frame = covid19_data_frame.loc[covid19_data_frame['continent'] == 'Europe']
 
 # Replace NaN values with 0 for the following columns. 
-columns_to_replace_nan = ['total_cases', 'total_deaths', 'new_cases', 'new_deaths','total_tests']
+columns_to_replace_nan = ['total_cases', 'total_deaths', 'new_cases', 'new_deaths']
 covid19_data_frame[columns_to_replace_nan] = covid19_data_frame[columns_to_replace_nan].fillna(0)
 
 # calculating the total confirmed cases, total deaths, new confirmed cases and new deaths
@@ -136,29 +142,13 @@ app.layout = html.Div(
                     html.Div([  # content div
 
                         dcc.Markdown('''
-                            ##### Dataset provided by Johns Hopkins University Center for Systems Science and Engineering (JHU CSSE):
-                            https://systems.jhu.edu/
+                            ## Data on COVID-19 (coronavirus) by Our World in Data:
+                            https://ourworldindata.org/coronavirus
                            
                             Data Sources:
-                            * World Health Organization (WHO): https://www.who.int/
-                            * DXY.cn. Pneumonia. 2020. http://3g.dxy.cn/newh5/view/pneumonia.
-                            * BNO News: https://bnonews.com/index.php/2020/02/the-latest-coronavirus-cases/
-                            * National Health Commission of the People’s Republic of China (NHC):
-                            http://www.nhc.gov.cn/xcs/yqtb/list_gzbd.shtml
-                            * China CDC (CCDC): http://weekly.chinacdc.cn/news/TrackingtheEpidemic.htm
-                            * Hong Kong Department of Health: https://www.chp.gov.hk/en/features/102465.html
-                            * Macau Government: https://www.ssm.gov.mo/portal/
-                            * Taiwan CDC: https://sites.google.com/cdc.gov.tw/2019ncov/taiwan?authuser=0
-                            * US CDC: https://www.cdc.gov/coronavirus/2019-ncov/index.html
-                            * Government of Canada: https://www.canada.ca/en/public-health/services/diseases/coronavirus.html
-                            * Australia Government Department of Health: https://www.health.gov.au/news/coronavirus-update-at-a-glance
-                            * European Centre for Disease Prevention and Control (ECDC): https://www.ecdc.europa.eu/en/geographical-distribution-2019-ncov-cases 
-                            * Ministry of Health Singapore (MOH): https://www.moh.gov.sg/covid-19
-                            * Italy Ministry of Health: http://www.salute.gov.it/nuovocoronavirus
-                            * 1Point3Arces: https://coronavirus.1point3acres.com/en
-                            * WorldoMeters: https://www.worldometers.info/coronavirus/
+                            * GitHub repository for the data: https://github.com/owid/covid-19-data/tree/master/public/data
                             '''),
-                        html.Hr(),
+                        # html.Hr(),
                         html.Button('Close', id='modal-close-button',
                         style={
                              'color': colors['text'],
@@ -178,9 +168,9 @@ app.layout = html.Div(
 
                 html.Div(
                     [
-                        html.Span('Dashboard: Covid-19 outbreak. (Updated once a day, based on consolidated last day total) Last Updated: ',
+                        html.Span('Dashboard: Covid-19 outbreak. Last Updated: ',
                                   style={'color': colors['text'],}),
-                        html.Span(datatime_convert(covid19_data_frame['date'].values[-1]) + '  00:01 (UTC).',
+                        html.Span(datatime_convert(covid19_data_frame['date'].values[-1]),
                                   style={'color': colors['confirmed_text'],
                                          'fontWeight': 'bold',}),
                     ],className='twelve columns'
@@ -188,12 +178,14 @@ app.layout = html.Div(
                 
                 html.Div(
                     [
-                        html.Span('Outbreak since: '+ datatime_convert(covid19_data_frame['date'].values[0]) + ': ',
+                        html.Span('Outbreak since: '+ datatime_convert(covid19_data_frame['date'].values[0]),
                                   style={'color': colors['text'],}),                        
                     ], className='twelve columns'
                 ),
-            ], className="row"
+            ], 
+            className="row", style={'margin': '15px 0'},  # Add a top and bottom margin
         ),
+        
 
         # Top column display of confirmed, death and recovered total numbers
         html.Div([
@@ -258,7 +250,7 @@ app.layout = html.Div(
             ),
 
             html.Div([
-                html.H4(children='New Deceased: ',
+                html.H4(children='New Decease: ',
                        style={
                            'textAlign': 'center',
                            'color': colors['recovered_text'],
@@ -276,15 +268,17 @@ app.layout = html.Div(
                 style=divBorderStyle,
                 className='three columns'
             ),
-        ], className='row'),
+        ],
+        className='row',
+        style={'margin': '15px 0'},  # Add a top and bottom margin
+        ),
 
         # add a dropdown for country selection and a date range picker
-        html.Div([
-            
+        html.Div([            
             html.Div([
                 dcc.Dropdown(id='country-dropdown',
                              options=[{'label': i, 'value': i} for i in countries_in_europe],
-                             value= countries_in_europe[0],  # Default value 
+                             value= ['Germany', 'France','Netherlands', 'Russia'],  # Default value 
                              multi=True,  # Allow multiple selections
                              ),
             ], style=divBorderStyle, className='six columns'),
@@ -295,7 +289,10 @@ app.layout = html.Div(
                                     end_date=covid19_data_frame['date'].max(),
                                     display_format='YYYY-MM-DD')                               
             ], style=divBorderStyle, className='six columns',),
-        ], className='row'),
+        ], 
+        className='row',
+        style={'margin': '15px 0'},  # Add a top and bottom margin
+        ),
 
         # place the line graph and the parallel coordinates plot side by side
         html.Div(
@@ -303,7 +300,6 @@ app.layout = html.Div(
                 html.Div([
                     dcc.Graph(
                         id='line-graph',
-
                     )
                 ], className='eight columns'
                 ),
@@ -311,17 +307,13 @@ app.layout = html.Div(
                 html.Div([
                     dcc.Graph(
                         id='pie-chart',
-
                     )
                 ], className='four columns'
                 ),
 
-            ], className="row",
-            style={
-                'textAlign': 'left',
-                'color': colors['text'],
-                'backgroundColor': colors['background'],
-            },
+            ], 
+            className="row",
+            style={'margin': '15px 0'},  # Add a top and bottom margin         
         ),
 
         # place the pie chart and the choropleth map side by side
@@ -330,7 +322,6 @@ app.layout = html.Div(
                 html.Div([
                     dcc.Graph(
                         id='parallel-coordinates',
-
                     )
                 ], className='eight columns'
                 ),
@@ -338,26 +329,21 @@ app.layout = html.Div(
                 html.Div([
                     dcc.Graph(
                         id='choropleth-map',
-
                     )
                 ], className='four columns'
                 ),
             ], className="row",
-            style={
-                'textAlign': 'left',
-                'color': colors['text'],
-                'backgroundColor': colors['background'],
-            },
+            style={'margin': '15px 0'},  # Add a top and bottom margin
         ),
      ], className='ten columns offset-by-one'
     ), 
     style={
         'textAlign': 'left',
         'color': colors['text'],
-        'backgroundColor': colors['background'],
     },
 )
-# Dash code end.
+# Dash Layout end.
+
 #############################################################################################################
 # Dash Callbacks.
 #############################################################################################################
@@ -381,7 +367,16 @@ def update_line_graph(countries, start_date, end_date):
                                      'new_deaths': 'New deaths'},
                              color='location', color_discrete_map=color_dict,
                              hover_data=['total_cases', 'total_deaths', 'new_cases', 'new_deaths'],
-                             title='Line Graphs for Multivariate Data', height=700)
+                             title='Line Graphs for Multivariate Data.', height=700)    
+    
+    fig_line_graph.update_layout(plot_bgcolor=colors['background'], paper_bgcolor=colors['background'],
+                                 title_font=dict(color=colors['figure_text']),
+                                 xaxis=dict(title_font=dict(color=colors['figure_text'])),
+                                 yaxis=dict(title_font=dict(color=colors['figure_text'])),
+                                 xaxis_tickfont=dict(color=colors['figure_text']),
+                                 yaxis_tickfont=dict(color=colors['figure_text']),
+                                 legend=dict(font=dict(color=colors['figure_text'])))
+    
     return fig_line_graph
 
 # Update the parallel coordinates plot based on the country selection and date range picker.
@@ -444,10 +439,12 @@ def update_parallel_coordinates_plot(countries, start_date, end_date):
             height=700,
             hovermode='closest',
             margin=dict(l=170, r=85, t=75))
-    )
+    )    
 
     # Updating margin of the plot
     fig_parallel_coordinates.update_layout(
+        plot_bgcolor=colors['background'],
+        paper_bgcolor=colors['background'],
         title={
             'text': "Parallel Coordinates",
             'y': 0.99,
@@ -455,9 +452,12 @@ def update_parallel_coordinates_plot(countries, start_date, end_date):
             'xanchor': 'center',
             'yanchor': 'top'
             },
-        font= dict(size=15, color="#000000")
-    )
-
+            title_font=dict(color=colors['figure_text']),
+            legend=dict(font=dict(color=colors['figure_text']))
+        )
+    
+    fig_parallel_coordinates.update_traces(labelfont=dict(color= colors['figure_text']))  # Change the color here
+    
     return fig_parallel_coordinates
 
 # Update the pie chart based on the country selection and date range picker.
@@ -476,7 +476,7 @@ def update_pie_chart(countries, start_date, end_date):
         (covid19_data_frame['date'] <= end_date) &
         pd.notnull(covid19_data_frame['total_tests']),
         ['location', 'total_tests', 'date']
-    ].groupby('location').last().reset_index()
+    ].groupby('location').last().reset_index()    
 
     fig_pie_chart = px.pie(recent_tests_data_frame, values='total_tests', names='location', title='Pie Chart',
                            color='location', color_discrete_map=color_dict, hover_data=['date'],
@@ -484,9 +484,19 @@ def update_pie_chart(countries, start_date, end_date):
                                    'total_tests': 'Total tests'}, height=700)
         
     fig_pie_chart.update_traces(textposition='inside', textinfo='percent+label',
-                                hovertemplate='Total tests: %{value} <br>Recent data available date,' + 'European country: %{customdata}</br>')
+                                hovertemplate='Total tests: %{value} <br>Recent data available date,' + 'European country: %{customdata}</br>',
+                                )
     
-    return fig_pie_chart
+    fig_pie_chart.update_layout(plot_bgcolor=colors['background'], paper_bgcolor=colors['background'],
+                                title_font=dict(color=colors['figure_text']),
+                                xaxis=dict(title_font=dict(color=colors['figure_text'])),
+                                yaxis=dict(title_font=dict(color=colors['figure_text'])),
+                                xaxis_tickfont=dict(color=colors['figure_text']),
+                                yaxis_tickfont=dict(color=colors['figure_text']),
+                                legend=dict(font=dict(color=colors['figure_text']))
+                            )
+
+    return fig_pie_chart                                                   
 
 # Update the choropleth map based on the country selection and date range picker.
 @app.callback(Output('choropleth-map', 'figure'),
@@ -507,7 +517,18 @@ def update_choropleth_map(countries, start_date, end_date):
                                        scope="europe", color_discrete_map=iso_code_color_dict)
     
     fig_choropleth_map.update_geos(fitbounds="locations", lataxis_showgrid=True, lonaxis_showgrid=True)
-    fig_choropleth_map.update_layout(height=700, title='Choropleth map (Europe)')
+    
+    fig_choropleth_map.update_layout(height=700, 
+                                     title='Choropleth map (Europe)', 
+                                     plot_bgcolor=colors['background'], 
+                                     paper_bgcolor=colors['background'],
+                                     title_font=dict(color=colors['figure_text']),
+                                     xaxis=dict(title_font=dict(color=colors['figure_text'])),
+                                    yaxis=dict(title_font=dict(color=colors['figure_text'])),
+                                    xaxis_tickfont=dict(color=colors['figure_text']),
+                                    yaxis_tickfont=dict(color=colors['figure_text']),
+                                    legend=dict(font=dict(color=colors['figure_text']))
+                                )
     
     return fig_choropleth_map
 
