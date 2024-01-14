@@ -2,12 +2,20 @@ import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
 from dash import Dash, dcc, html, Input, Output
+import datetime
 
 # Reading the csv data file via Github URL and filtering the data based on the continent 'Europe' start.
 data_set_url = 'https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv'
 covid19_data_frame = pd.read_csv(data_set_url)
-covid19_data_frame = covid19_data_frame.loc[
-    covid19_data_frame['continent'] == 'Europe']  # Filter out data based on Europe continent.
+
+# Filter out data based on Europe continent.
+covid19_data_frame = covid19_data_frame.loc[covid19_data_frame['continent'] == 'Europe']
+
+confirmed_total_cases = covid19_data_frame['total_cases'].sum()
+confirmed_new_cases = 0 if pd.isna(covid19_data_frame['new_cases'].values[-1]) else covid19_data_frame['new_cases'].values[-1]
+confirmed_total_deaths = covid19_data_frame['total_deaths'].sum()
+confirmed_new_deaths = 0 if pd.isna(covid19_data_frame['new_deaths'].values[-1]) else covid19_data_frame['new_deaths'].values[-1]
+
 # Reading the csv data file via Github URL and filtering the data based on the continent 'Europe' End.
 
 # CSS stylesheet for dash start.
@@ -207,6 +215,17 @@ fig4.update_geos(fitbounds="locations", lataxis_showgrid=True, lonaxis_showgrid=
 fig4.update_layout(height=700, title='Choropleth map (Europe)')
 # Task 4 from the concept paper End.
 
+# Custom functions start.
+
+def datatime_convert(date_str,days_to_add=0):
+    # Convert string to datetime object
+    format_str = '%Y-%m-%d' # The format
+    datetime_obj = datetime.datetime.strptime(date_str, format_str)
+    datetime_obj += datetime.timedelta(days=days_to_add)
+    return datetime_obj.strftime('%d-%b-%Y')
+
+
+
 # Dash code start.
 app.layout = html.Div(
     html.Div([
@@ -278,6 +297,26 @@ app.layout = html.Div(
                     className='modal',
                     style={"display": "none"},
                 ),
+
+                html.Div(
+                    [
+                        html.Span('Dashboard: Covid-19 outbreak. (Updated once a day, based on consolidated last day total) Last Updated: ',
+                                  style={'color': colors['text'],}),
+                        html.Span(datatime_convert(covid19_data_frame['date'].values[-1]) + '  00:01 (UTC).',
+                                  style={'color': colors['confirmed_text'],
+                                         'fontWeight': 'bold',}),
+                    ],className='twelve columns'
+                ),
+                
+                html.Div(
+                    [
+                        html.Span('Outbreak since'+ datatime_convert(covid19_data_frame['date'].values[0]) + ': ',
+                                  style={'color': colors['text'],}),
+                        # html.Span(str(return_outbreakdays(datatime_convert(df_confirmed.columns[-1],1))) + '  days.',
+                        #           style={'color': colors['confirmed_text'],
+                        #                  'fontWeight': 'bold',})
+                    ], className='twelve columns'
+                ),
             ], className="row"
         ),
 
@@ -290,24 +329,26 @@ app.layout = html.Div(
                            'color': colors['confirmed_text'],
                        }
                        ),
-                html.P(f"{df_confirmed_total[-1]:,d}",
+                # format a floating-point number with commas as thousands separators
+                html.P(f"{confirmed_total_cases:,.0f}",
                        style={
                     'textAlign': 'center',
                     'color': colors['confirmed_text'],
                     'fontSize': 30,
                 }
                 ),
-                html.P('Past 24hrs increase: +' + f"{df_confirmed_total[-1] - df_confirmed_total[-2]:,d}"
-                       + ' (' + str(round(((df_confirmed_total[-1] - df_confirmed_total[-2])/df_confirmed_total[-1])*100, 2)) + '%)',
-                       style={
-                    'textAlign': 'center',
-                    'color': colors['confirmed_text'],
-                }
-                ),
+                # html.P('Past 24hrs increase: +' + f"{df_confirmed_total[-1] - df_confirmed_total[-2]:,d}"
+                #        + ' (' + str(round(((df_confirmed_total[-1] - df_confirmed_total[-2])/df_confirmed_total[-1])*100, 2)) + '%)',
+                #        style={
+                #     'textAlign': 'center',
+                #     'color': colors['confirmed_text'],
+                # }
+                # ),
             ],
                 style=divBorderStyle,
                 className='four columns',
             ),
+
             html.Div([
                 html.H4(children='Total Deceased: ',
                        style={
@@ -315,45 +356,76 @@ app.layout = html.Div(
                            'color': colors['deaths_text'],
                        }
                        ),
-                html.P(f"{df_deaths_total[-1]:,d}",
+                # format a floating-point number with commas as thousands separators.
+                html.P(f"{confirmed_total_deaths:,.0f}",
                        style={
                     'textAlign': 'center',
                     'color': colors['deaths_text'],
                     'fontSize': 30,
                 }
                 ),
-                html.P('Mortality Rate: ' + str(round(df_deaths_total[-1]/df_confirmed_total[-1] * 100, 3)) + '%',
-                       style={
-                    'textAlign': 'center',
-                    'color': colors['deaths_text'],
-                }
-                ),
+                # html.P('Mortality Rate: ' + str(round(df_deaths_total[-1]/df_confirmed_total[-1] * 100, 3)) + '%',
+                #        style={
+                #     'textAlign': 'center',
+                #     'color': colors['deaths_text'],
+                # }
+                # ),
             ],
                 style=divBorderStyle,
-                className='four columns'),
+                className='four columns'
+            ),
+            
             html.Div([
-                html.H4(children='Total Recovered: ',
+                html.H4(children='New Cases: ',
                        style={
                            'textAlign': 'center',
                            'color': colors['recovered_text'],
                        }
                        ),
-                html.P(f"{df_recovered_total[-1]:,d}",
+                # format a integer number with commas as thousands separators
+                html.P(f"{confirmed_new_cases:,.0f}",
                        style={
                     'textAlign': 'center',
                     'color': colors['recovered_text'],
                     'fontSize': 30,
                 }
                 ),
-                html.P('Recovery Rate: ' + str(round(df_recovered_total[-1]/df_confirmed_total[-1] * 100, 3)) + '%',
+                # html.P('Recovery Rate: ' + str(round(df_recovered_total[-1]/df_confirmed_total[-1] * 100, 3)) + '%',
+                #        style={
+                #     'textAlign': 'center',
+                #     'color': colors['recovered_text'],
+                # }
+                # ),
+            ],
+                style=divBorderStyle,
+                className='four columns'
+            ),
+
+            html.Div([
+                html.H4(children='New Deceased: ',
+                       style={
+                           'textAlign': 'center',
+                           'color': colors['recovered_text'],
+                       }
+                       ),
+                # format a integer number with commas as thousands separators
+                html.P(f"{confirmed_new_deaths:,.0f}",
                        style={
                     'textAlign': 'center',
                     'color': colors['recovered_text'],
+                    'fontSize': 30,
                 }
                 ),
+                # html.P('Recovery Rate: ' + str(round(df_recovered_total[-1]/df_confirmed_total[-1] * 100, 3)) + '%',
+                #        style={
+                #     'textAlign': 'center',
+                #     'color': colors['recovered_text'],
+                # }
+                # ),
             ],
                 style=divBorderStyle,
-                className='four columns'),
+                className='four columns'
+            ),
         ], className='row'),
 
         # place the line graph and the parallel coordinates plot side by side
@@ -413,7 +485,7 @@ app.layout = html.Div(
                 
                 html.Div([
                     dcc.Graph(
-                        id='parallel-coordinates-plot',
+                        id='parallel-coordinates',
 
                     )
                 ], className='five columns'
@@ -440,7 +512,7 @@ app.layout = html.Div(
                 
                 html.Div([
                     dcc.Graph(
-                        id='map',
+                        id='choropleth-map',
 
                     )
                 ], className='five columns'
@@ -475,18 +547,31 @@ app.layout = html.Div(
 # Dash code end.
 
 
-@app.callback(Output('tabs-content', 'children'),
-              [Input('tabs', 'value')])
-def render_content(tab):
-    if tab == 'tab-1':
-        return html.Div([dcc.Graph(id='line-graph', figure=fig1)])
-    elif tab == 'tab-2':
-        return html.Div([dcc.Graph(id='parallel-coordinates', figure=fig2)])
-    elif tab == 'tab-3':
-        return html.Div([dcc.Graph(id='pie-chart', figure=fig3)])
-    else:
-        return html.Div([dcc.Graph(id='choropleth-map', figure=fig4)])
+# @app.callback(Output('tabs-content', 'children'),
+#               [Input('tabs', 'value')])
+# def render_content(tab):
+#     if tab == 'tab-1':
+#         return html.Div([dcc.Graph(id='line-graph', figure=fig1)])
+#     elif tab == 'tab-2':
+#         return html.Div([dcc.Graph(id='parallel-coordinates', figure=fig2)])
+#     elif tab == 'tab-3':
+#         return html.Div([dcc.Graph(id='pie-chart', figure=fig3)])
+#     else:
+#         return html.Div([dcc.Graph(id='choropleth-map', figure=fig4)])
 
+# hide/show modal
+@app.callback(Output('modal', 'style'),
+              [Input('info-button', 'n_clicks')])
+def show_modal(n):
+    if n > 0:
+        return {"display": "block"}
+    return {"display": "none"}
+
+# Close modal by resetting info_button click to 0
+@app.callback(Output('info-button', 'n_clicks'),
+              [Input('modal-close-button', 'n_clicks')])
+def close_modal(n):
+    return 0
 
 if __name__ == '__main__':
     app.run_server(debug=True)
