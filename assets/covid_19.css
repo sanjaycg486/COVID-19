@@ -5,24 +5,35 @@ body {
 .Select-control {
     background-color: #393939;
     border: 2px solid #CD6;
-    border-radius: 5px;    
+    border-radius: 5px;        
+}
+.Select-input{
+    color: #fff !important;
 }
 
 .DateRangePickerInput{
     background-color: #393939;
     border: 2px solid #CD6;
-    border-radius: 2px;
-    width: 367px !important    
+    border-radius: 2px;        
 }
 
 .DateInput_input{
     background-color: #393939 !important;
     /* border: 2px solid #CD6 !important; */
     border-radius: 2px !important;
-    color: #fff !important;
+    color: #CD6 !important;
 }
 .DateRangePickerInput_arrow_svg{
+    fill: #fff !important;
+}
+
+.Select--multi .Select-value{
     color: #fff !important;
+    border: 1px solid #CD6;
+}
+.Select--multi .Select-value-icon{
+    color: #fff !important;
+    border: 1px solid #CD6;
 }
 
 #line-graph {    

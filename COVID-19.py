@@ -281,14 +281,14 @@ app.layout = html.Div(
                              value= ['Germany', 'France','Netherlands', 'Russia'],  # Default value 
                              multi=True,  # Allow multiple selections
                              ),
-            ], style=divBorderStyle, className='six columns'),
+            ], style=divBorderStyle, className='eight columns'),
 
             html.Div([
                 dcc.DatePickerRange(id='date-range-slider',
                                     start_date=covid19_data_frame['date'].min(),
                                     end_date=covid19_data_frame['date'].max(),
                                     display_format='YYYY-MM-DD')                               
-            ], style=divBorderStyle, className='six columns',),
+            ], style=divBorderStyle, className='four columns',),
         ], 
         className='row',
         style={'margin': '15px 0'},  # Add a top and bottom margin
@@ -367,7 +367,7 @@ def update_line_graph(countries, start_date, end_date):
                                      'new_deaths': 'New deaths'},
                              color='location', color_discrete_map=color_dict,
                              hover_data=['total_cases', 'total_deaths', 'new_cases', 'new_deaths'],
-                             title='Line Graphs for Multivariate Data.', height=700)    
+                             title='Line Graphs for Multivariate Data', height=700)    
     
     fig_line_graph.update_layout(plot_bgcolor=colors['background'], paper_bgcolor=colors['background'],
                                  title_font=dict(color=colors['figure_text']),

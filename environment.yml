@@ -1,0 +1,8 @@
+name: covid-19
+channels:
+  - defaults
+dependencies:
+  - python
+  - pandas
+  - dash
+  
