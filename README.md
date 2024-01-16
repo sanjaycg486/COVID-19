@@ -40,19 +40,19 @@ By providing a location dropdown and date filter, we have made the visualization
 
 ## How To Run
 
-This project uses Conda for managing environments and dependencies. The [`environment.yaml`](environment.yml) file contains the list of all dependencies needed to run the project.
+This project uses Conda for managing environments and dependencies. The [`environment.yml`](environment.yml) file contains the list of all dependencies needed to run the project.
 
 Follow these steps to run the project:
 
 1. **Install Conda**: If you haven't installed Conda yet, you can download it from [here](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html). Follow the instructions for your specific operating system.
 
-2. **Create a Conda environment**: Navigate to the project directory in your terminal and run the following command to create a new Conda environment based on the [`environment.yaml`](environment.yml) file:
+2. **Create a Conda environment**: Navigate to the project directory in your terminal and run the following command to create a new Conda environment based on the [`environment.yml`](environment.yml) file:
 
     ```bash
-    conda env create -f environment.yaml
+    conda env create -f environment.yml
     ```
 
-    This will create a new Conda environment with the name specified in the [`environment.yaml`](environment.yml) file.
+    This will create a new Conda environment with the name specified in the [`environment.yml`](environment.yml) file.
 
 3. **Activate the Conda environment**: Use the following command to activate the newly created environment:
 
