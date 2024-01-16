@@ -18,7 +18,7 @@
 6. [License](#license)
 
 ## Introduction
-As part of the Master Course "Interactive Data Visualization" at Paderborn University, we need to do a mini-group project on the topic "COVID-19" pandemic.
+As part of the Master Course [Interactive Data Visualization](https://cs.uni-paderborn.de/en/cgvb/lehre/vergangene-semester/ss-20/interactive-data-visualization) at Paderborn University, we need to do a mini-group project on the topic "COVID-19" pandemic.
 
 Group Members: [Varun Golani](https://github.com/vargo96), [Lalith Sagar](https://github.com/Lalith-Sagar-Devagudi), [Sanjay Gupta](https://github.com/sanjaycg486).
 
@@ -38,7 +38,7 @@ Dataset: [Our World in Data (University of Oxford)](https://ourworldindata.org/c
 
 By providing a location dropdown and date filter, we have made the visualization more interactive and user-friendly. Users can select a specific country and time period for a more focused analysis. This makes our visualization a powerful tool for understanding and responding to the COVID-19 pandemic.
 
-**Note:** Please refer to the [COVID-19-Concept-paper.pdf](COVID-19-Concept-paper.pdf) and [COVID-19-Basic-Information-Sheet.pdf](COVID-19-Basic-Information-Sheet.pdf) for more details.
+**Note:** Please refer to the [COVID-19-Concept-paper.pdf](COVID-19-Concept-paper.pdf), [COVID-19-Basic-Information-Sheet.pdf](COVID-19-Basic-Information-Sheet.pdf), and [COVID-19-presentation.mp4](COVID-19-presentation.mp4) for more details.
 
 ## How To Run
 
