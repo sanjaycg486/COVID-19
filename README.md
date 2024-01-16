@@ -1,30 +1,28 @@
 # Analysis and Visualization of COVID-19 Impact and Response in Europe.
 
 [![Python](https://img.shields.io/badge/Python-3.12.0-%233776AB?logo=Python)](https://www.python.org/)
-[![dash](https://img.shields.io/badge/Dash-2.7.0-%233776AB?logo=Python)](https://pypi.org/project/dash/2.7.0/)
-[![Flask](https://img.shields.io/badge/Flask-2.2.5-%233776AB?logo=Python)](https://pypi.org/project/Flask/2.2.5/)
-[![plotly](https://img.shields.io/badge/Plotly-5.9.0-%233776AB?logo=Python)](https://pypi.org/project/plotly/5.9.0/)
-[![pandas](https://img.shields.io/badge/Pandas-2.1.4-%233776AB?logo=Python)](https://pypi.org/project/pandas/)
-[![numpy](https://img.shields.io/badge/Numpy-1.26.3-%233776AB?logo=Python)](https://pypi.org/project/numpy/)
-![GitHub last commit](https://img.shields.io/github/last-commit/sanjaycg486/COVID-19)
+[![dash](https://img.shields.io/badge/Dash-2.7.0-%233776AB?logo=Dash)](https://pypi.org/project/dash/2.7.0/)
+[![Flask](https://img.shields.io/badge/Flask-2.2.5-%233776AB?logo=Flask)](https://pypi.org/project/Flask/2.2.5/)
+[![plotly](https://img.shields.io/badge/Plotly-5.9.0-%233776AB?logo=plotly)](https://pypi.org/project/plotly/5.9.0/)
+[![pandas](https://img.shields.io/badge/Pandas-2.1.4-%233776AB?logo=pandas)](https://pypi.org/project/pandas/)
+[![numpy](https://img.shields.io/badge/Numpy-1.26.3-%233776AB?logo=numpy)](https://pypi.org/project/numpy/)
+![GitHub last commit](https://img.shields.io/github/last-commit/sanjaycg486/COVID-19?logo=github)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-## Table of Contents
-1. [Introduction](#introduction)
-2. [Tasks](#tasks)
-3. [How To Run](#how-to-run)
-4. [Results](#results)
-5. [Acknowledgements](#acknowledgements)
-6. [License](#license)
-
-## Introduction
-As part of the Master Course [Interactive Data Visualization](https://cs.uni-paderborn.de/en/cgvb/lehre/vergangene-semester/ss-20/interactive-data-visualization) at [Paderborn University](https://www.uni-paderborn.de/en/) we need to do a mini-group project on the topic "COVID-19" pandemic.
+As part of the Master Course [Interactive Data Visualization (SS-2020)](https://cs.uni-paderborn.de/en/cgvb/lehre/vergangene-semester/ss-20/interactive-data-visualization) at [Paderborn University](https://www.uni-paderborn.de/en/) we need to do a mini-group project on the topic "COVID-19" pandemic.
 
 Group Members: [Varun Golani](https://github.com/vargo96), [Lalith Sagar](https://github.com/Lalith-Sagar-Devagudi), [Sanjay Gupta](https://github.com/sanjaycg486).
 
 We used the following data source to perform our task:
 
 Dataset: [Our World in Data (University of Oxford)](https://ourworldindata.org/coronavirus)
+
+## Table of Contents
+1. [Tasks](#tasks)
+2. [How To Run](#how-to-run)
+3. [Results](#results)
+4. [Acknowledgements](#acknowledgements)
+5. [License](#license)
 
 ## Tasks
 
